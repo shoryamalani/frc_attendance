@@ -246,6 +246,13 @@
                     }
                 }
                 nameCell.innerHTML = signedIn[i].name;
+                // switch from GMT to current time zone
+                var date = new Date(signedIn[i][1]);
+                var offset = date.getTimezoneOffset();
+                date = new Date(date.getTime() - (offset*60*1000));
+                signedIn[i][1] = date.toLocaleString();
+
+
                 timeCell.innerHTML = signedIn[i][1];
             }
         }
