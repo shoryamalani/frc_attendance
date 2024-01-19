@@ -79,6 +79,15 @@ sign = function(isSignIn) {
         members: selectedMembers,
         isSignIn: isSignIn
     }));
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            // Refresh the page
+            alert('Success!');
+            location.reload();
+        } else {
+            alert('Error signing in/out.');
+        }
+    }
 }
 
 // Add members matching the search text
