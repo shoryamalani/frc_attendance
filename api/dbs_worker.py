@@ -129,7 +129,7 @@ INSERT INTO system_info (id,version,last_updated,data) VALUES (1,'{}',NOW(),'{{}
 
 def get_team_sign_ins(conn,team_number):
     table = pypika.Table('log')
-    query = pypika.Query.from_(table).select('*').where(table.team_number == team_number).where(table.issignin == True)
+    query = pypika.Query.from_(table).select('*').where(table.team_number == team_number)
     data = execute_db.execute_database_command(conn,query.get_sql())
     if data[1].rowcount == 0:
         return []
