@@ -120,6 +120,8 @@ def get_who_is_signed_in():
         # is the last sign in time greater than the last sign out time?
         final_signed_in[key][0].sort()
         final_signed_in[key][1].sort()
+        if len(final_signed_in[key][0]) == 0:
+            continue
         if len(final_signed_in[key][1]) == 0:
             signed_in.append([key, final_signed_in[key][0][-1]])
             continue
