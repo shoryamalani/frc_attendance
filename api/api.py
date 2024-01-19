@@ -121,8 +121,8 @@ def get_who_is_signed_in():
         final_signed_in[key][0].sort()
         final_signed_in[key][1].sort()
 
-        if len(final_signed_in[key][0]) > len(final_signed_in[key][1]):
-            
+        # if len(final_signed_in[key][0]) > len(final_signed_in[key][1]):
+        if final_signed_in[key][0][-1] > final_signed_in[key][1][-1]:
             signed_in.append([key, final_signed_in[key][0][-1]])
     print(signed_in) 
 
