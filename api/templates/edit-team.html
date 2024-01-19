@@ -249,7 +249,7 @@
                 // switch from GMT to current time zone
                 var date = new Date(signedIn[i][1]);
                 var offset = date.getTimezoneOffset();
-                date = new Date(date.getTime() + (offset*60*1000));
+                // date = new Date(date.getTime() + (offset*60*1000));
                 signedIn[i][1] = date.toLocaleString();
 
 
