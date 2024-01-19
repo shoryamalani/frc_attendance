@@ -126,6 +126,16 @@ INSERT INTO system_info (id,version,last_updated,data) VALUES (1,'{}',NOW(),'{{}
     conn.cursor().execute(s)
     conn.commit()
 
+
+def get_team_sign_ins(conn,team_number):
+    table = pypika.Table('log')
+    query = pypika.Query.from_(table).select('*').where(table.team_number == team_number).where(table.issignin == True)
+    data = execute_db.execute_database_command(conn,query.get_sql())
+    if data[1].rowcount == 0:
+        return []
+    else:
+        return data[1].fetchall()
+
 def get_version(conn):
     # Define the table
     system_info = Table('system_info')

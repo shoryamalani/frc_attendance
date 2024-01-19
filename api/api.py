@@ -94,6 +94,42 @@ def sign():
         'success': True
     }), 200
 
+@app.route('/api/getWhoIsSignedIn', methods=['POST'])
+def get_who_is_signed_in():
+    team = request.json['teamNumber']
+    conn = dbs_worker.set_up_connection()
+    sign_ins = dbs_worker.get_team_sign_ins(conn, team)
+    final_signed_in = {
+
+    }
+    print(sign_ins)
+    for sign_in in sign_ins:
+        if sign_in[4]:
+            if sign_in[1] not in final_signed_in:
+                final_signed_in[sign_in[1]] = [[],[]]
+            final_signed_in[sign_in[1]][0].append(sign_in[3])
+        else:
+            if sign_in[1] not in final_signed_in:
+                final_signed_in[sign_in[1]] = [[],[]]
+            final_signed_in[sign_in[1]][1].append(sign_in[3])
+    signed_in = []
+
+    for key in final_signed_in:
+        # [[2024-01-19 14:16:43.427], [2024-01-19 14:16:43.427]]
+        # [[sign in times], [sign out times]]]
+        # is the last sign in time greater than the last sign out time?
+        final_signed_in[key][0].sort()
+        final_signed_in[key][1].sort()
+
+        if len(final_signed_in[key][0]) > len(final_signed_in[key][1]):
+            signed_in.append([key, final_signed_in[key][0][-1]])
+    print(signed_in) 
+
+    return jsonify({
+        'success': True,
+        'signedIn': signed_in
+    }), 200
+
 @app.route('/createTeam')
 def bill_page():
     return render_template('create-team.html')

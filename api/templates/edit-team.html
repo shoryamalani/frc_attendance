@@ -72,7 +72,7 @@
     </div>
 
 <!-- Students Table -->
-<div class="mt-6 mb-6">
+<div class="mt-6 mb-6 overflow-auto" style="max-height: 300px;">
     <table class="w-full text-sm text-left text-gray-500">
         <thead class="text-xs text-gray-700 uppercase bg-gray-50">
             <tr>
@@ -86,6 +86,23 @@
         </tbody>
     </table>
 </div> 
+<!-- Sign-in Table -->
+<div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-7xl">
+    <h3 class="text-xl font-semibold text-gray-800 mb-6 text-center">Sign-in Log</h3>
+    <div class="overflow-auto" style="max-height: 300px;">
+        <table class="w-full text-sm text-left text-gray-500">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                    <th scope="col" class="px-6 py-3">Name</th>
+                    <th scope="col" class="px-6 py-3">Sign-in Time</th>
+                </tr>
+            </thead>
+            <tbody id="signInTable">
+                <!-- Sign-in entries will be added here -->
+            </tbody>
+        </table>
+    </div>
+</div>
 </div>
 </div>
 </div>
@@ -100,6 +117,7 @@
 
         // get the team number from the URL
         var currentTeamNum = window.location.href.split('/').pop();
+        var members = [];
         if (currentTeamNum == 'teamEdit') {
             currentTeamNum = null;
         }
@@ -176,8 +194,23 @@
                         //localStorage.setItem('authToken', data.token);
                         console.log(data);
                         // Hide password section and show management section
+                        console.log(data)
                         members = data.teamMembers;
                         setMembers(members);
+                        var xhr2 = new XMLHttpRequest(); 
+            xhr2.open('POST', '/api/getWhoIsSignedIn');
+            xhr2.setRequestHeader('Content-Type', 'application/json');
+            xhr2.send(JSON.stringify({ 
+                teamNumber: currentTeamNum,
+             }));
+
+             xhr2.onload = function() {
+                if (xhr2.status === 200) {
+                    var data = JSON.parse(xhr2.responseText);
+                    if (data.success) {
+                        console.log("data",data);
+                        console.log(members)
+                        setSignedInTable(data.signedIn);
                     } else {
                         console.log(data)
                         alert('Incorrect password!');
@@ -187,8 +220,36 @@
                     alert('Request failed.  Returned status of ' + xhr.status);
                 }
             };
-
+                    } else {
+                        console.log(data)
+                        alert('Incorrect password!');
+                    }
+                }
+                else {
+                    alert('Request failed.  Returned status of ' + xhr.status);
+                }
+            };
+            
         }
+        function setSignedInTable(signedIn){
+            var table = document.getElementById('signInTable');
+            table.innerHTML = '';
+            for(var i = 0; i < signedIn.length; i++){
+                var row = table.insertRow();
+                var nameCell = row.insertCell();
+                var timeCell = row.insertCell();
+                var curId = signedIn[i][0]
+                console.log(members)
+                for (var j = 0; j < members.length; j++) {
+                    if (members[j].id == curId) {
+                        signedIn[i].name = members[j].name;
+                    }
+                }
+                nameCell.innerHTML = signedIn[i].name;
+                timeCell.innerHTML = signedIn[i][1];
+            }
+        }
+
         function addStudent(){
             var name = document.getElementById('student_name').value;
             if(name == ""){
@@ -265,6 +326,7 @@
             };
 
         }
+        
     </script>
 
 </body>
