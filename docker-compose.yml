@@ -9,7 +9,7 @@ services:
     ports:
       - "5010:5000"
     links:
-      - postgres:postgres
+      - postgres_frc:postgres_frc
     networks:
       - robotics_backend
   # client:
@@ -24,8 +24,8 @@ services:
   #     - backend:backend
   #   networks:
   #     - robotics_backend
-  postgres:
-    container_name: postgres
+  postgres_frc:
+    container_name: postgres_frc
     image: postgres:latest
     restart: always
     environment:
@@ -34,7 +34,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
-      - "5432:5432"
+      - "5442:5432"
     expose:
       - "5432"
     networks:
