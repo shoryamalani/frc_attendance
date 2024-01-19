@@ -1,0 +1,15 @@
+click==8.0.1
+Flask==2.0.1
+gunicorn==20.1.0
+itsdangerous==2.0.1
+Jinja2==3.0.1
+MarkupSafe==2.0.1
+python-dotenv==0.17.1
+Werkzeug==2.0.1
+psycopg2==2.9.1
+pypika==0.48.9
+requests==2.26.0
+ratelimit==2.2.1
+schedule==1.1.0
+loguru==0.5.1
+PyJWT

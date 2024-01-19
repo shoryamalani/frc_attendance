@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Team</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet">
+    <link href="path/to/custom-style.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 h-screen flex items-center justify-center">
+
+    <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-7xl">
+        <!-- center this -->
+        <h1 class="text-2xl font-bold text-gray-700 mb-6 text-center">Create Team</h1>
+
+        <form id="teamForm">
+            <!-- Team Number -->
+            <div class="text-center">
+                <!-- center this -->
+                <label for="team_number" class="form-label">Team Number:</label>
+                <input type="text" id="team_number" class="form-input" placeholder="1234" required>
+            </div>
+        
+            <!-- Student Input Fields -->
+            <div class="mb-4">
+                <div class="grid grid-cols-3 gap-4">
+                    <!-- Student Name -->
+                    <div>
+                        <label for="student_name" class="form-label">Student Name:</label>
+                        <input type="text" id="student_name" class="form-input" placeholder="John Doe">
+                    </div>
+
+                    <!-- Year Dropdown -->
+                    <div>
+                        <label for="year" class="form-label">Year:</label>
+                        <select id="year" class="form-input">
+                            <option value="">Select Year</option>
+                            <option value="1">Freshman</option>
+                            <option value="2">Sophomore</option>
+                            <option value="3">Junior</option>
+                            <option value="4">Senior</option>
+                            <option value="5">Fifth-Year</option>
+                        </select>
+                    </div>
+
+                    <!-- Subteam -->
+                    <div>
+                        <label for="subteam" class="form-label">Subteam (Optional):</label>
+                        <input type="text" id="subteam" class="form-input" placeholder="Design, Programming, etc.">
+                    </div>
+                </div>
+                
+                <!-- Add Button -->
+                <div class="flex justify-center mt-4">
+                    <button type="button" onclick="addStudent()" class="form-button">Add Student</button>
+                </div>
+            </div>
+
+            <!-- Students Table -->
+            <div class="mt-6 mb-6">
+                <table class="w-full text-sm text-left text-gray-500">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Student Name</th>
+                            <th scope="col" class="px-6 py-3">Year</th>
+                            <th scope="col" class="px-6 py-3">Subteam</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTable">
+                        <!-- Students will be added here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Password -->
+            <Divider></Divider>
+            <div>
+                <label for="password" class="form-label">Password:</label>
+                <input type="password" id="password" class="form-input"> <required>
+            </div>
+                    <!-- Submit Button -->
+        <div class="flex justify-center mt-6">
+            <button type="submit" class="form-button">Create Team</button>
+        </div>
+    </form>
+</div>
+
+<script>
+   function addStudent() {
+    var name = document.getElementById('student_name').value;
+    var year = document.getElementById('year').value;
+    var subteam = document.getElementById('subteam').value;
+
+    if(name === '') {
+        alert('Please enter a student name.');
+        return;
+    }
+
+    var table = document.getElementById('studentsTable');
+    var row = table.insertRow();
+    row.className = 'student-row';
+
+    var cell1 = row.insertCell(0);
+    var cell2 = row.insertCell(1);
+    var cell3 = row.insertCell(2);
+    var cell4 = row.insertCell(3);
+
+    cell1.textContent = name;
+    cell2.value = year;
+    cell3.textContent = subteam;
+
+    // Trash Button
+    var trashBtn = document.createElement('button');
+    trashBtn.innerHTML = '🗑️';
+    trashBtn.onclick = function() {
+        this.parentElement.parentElement.remove();
+    };
+    trashBtn.className = 'form-button';
+    cell4.appendChild(trashBtn);
+
+    // Clear input fields after adding
+    document.getElementById('student_name').value = '';
+    document.getElementById('year').value = '';
+    document.getElementById('subteam').value = '';
+}
+
+// on submit
+
+document.getElementById('teamForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    var teamNumber = document.getElementById('team_number').value;
+    var password = document.getElementById('password').value;
+
+    if(teamNumber === '') {
+        alert('Please enter a team number.');
+        return;
+    }
+
+    if(password === '') {
+        alert('Please enter a password.');
+        return;
+    }
+
+    var students = [];
+    var rows = document.getElementsByClassName('student-row');
+    for(var i = 0; i < rows.length; i++) {
+        var cells = rows[i].getElementsByTagName('td');
+        var student = {
+            name: cells[0].textContent,
+            year: cells[1].textContent,
+            subteam: cells[2].textContent
+        };
+        students.push(student);
+    }
+
+    var data = {
+        teamNumber: teamNumber,
+        password: password,
+        teamMembers: students
+    };
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/createTeam', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify(data));
+
+    xhr.onload = function() {
+        if(xhr.status === 200) {
+            var response = JSON.parse(xhr.responseText);
+            if(response.success) {
+                alert('Team created successfully!');
+                window.location.href = '/teamEdit/' + teamNumber;
+            } else {
+                alert('Team created successfully!');
+                window.location.href = '/teamEdit/' + teamNumber;
+            }
+        } else {
+            alert('Error creating team.');
+        }
+    };
+});
+
+</script>
+</body>
+</html>

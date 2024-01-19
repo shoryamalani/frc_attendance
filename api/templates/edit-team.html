@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Management</title>
+    <!-- Include Tailwind CSS and custom styles here -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet">
+    <link href="path/to/custom-style.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 h-screen">
+<!-- Password Protection Section -->
+<div id="passwordSection" class="flex items-center justify-center h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-md max-w-sm w-full mx-4">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Access Team Management</h2>
+        
+        {% if teamNumber %}
+            <h3 class="text-xl font-semibold text-gray-800 mb-6 text-center">Team {{teamNumber}}</h3>
+        {% else %}
+            <div class="mb-4">
+                <label for="teamNumberInput" class="block text-sm font-medium text-gray-700">Team Number</label>
+                <input type="number" id="teamNumberInput" class="form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="Team Number">
+            </div>
+        {% endif %}
+
+        <div class="mb-6">
+            <label for="passwordInput" class="block text-sm font-medium text-gray-700">Password</label>
+            <input type="password" id="passwordInput" class="form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="Enter your password">
+        </div>
+        
+        <button onclick="checkPassword()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out">Submit</button>
+    </div>
+</div>
+
+<!-- Team Management Section (Initially Hidden) -->
+<div id="managementSection" class="hidden">
+   <!-- Student Input Fields -->
+   <div class="bg-gray-100 h-screen flex items-center justify-center">
+   <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-7xl">
+    <h3 id="teamNumberLabel" class="text-xl font-semibold text-gray-800 mb-6 text-center"></h3>
+   <div class="mb-4">
+    <div class="grid grid-cols-3 gap-4">
+        <!-- Student Name -->
+        <div>
+            <label for="student_name" class="form-label">Student Name:</label>
+            <input type="text" id="student_name" class="form-input" placeholder="John Doe">
+        </div>
+
+        <!-- Year Dropdown -->
+        <div>
+            <label for="year" class="form-label">Year:</label>
+            <select id="year" class="form-input">
+                <option value="">Select Year</option>
+                <option value="1">Freshman</option>
+                <option value="2">Sophomore</option>
+                <option value="3">Junior</option>
+                <option value="4">Senior</option>
+                <option value="5">Fifth-Year</option>
+            </select>
+        </div>
+
+        <!-- Subteam -->
+        <div>
+            <label for="subteam" class="form-label">Subteam (Optional):</label>
+            <input type="text" id="subteam" class="form-input" placeholder="Design, Programming, etc.">
+        </div>
+    </div>
+    
+    <!-- Add Button -->
+    <div class="flex justify-center mt-4">
+        <button type="button" onclick="addStudent()" class="form-button">Add Student</button>
+    </div>
+
+<!-- Students Table -->
+<div class="mt-6 mb-6">
+    <table class="w-full text-sm text-left text-gray-500">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+            <tr>
+                <th scope="col" class="px-6 py-3">Student Name</th>
+                <th scope="col" class="px-6 py-3">Year</th>
+                <th scope="col" class="px-6 py-3">Subteam</th>
+            </tr>
+        </thead>
+        <tbody id="studentsTable">
+            <!-- Students will be added here -->
+        </tbody>
+    </table>
+</div> 
+</div>
+</div>
+</div>
+
+    
+
+</div>
+
+    <script>
+
+        
+
+        // get the team number from the URL
+        var currentTeamNum = window.location.href.split('/').pop();
+        if (currentTeamNum == 'teamEdit') {
+            currentTeamNum = null;
+        }
+        function setMembers(members){
+            console.log(members)
+            var table = document.getElementById('studentsTable');
+            table.innerHTML = '';
+    
+            for(var i = 0; i < members.length; i++){
+                var row = table.insertRow();
+                row.id = members[i].id;
+                var nameCell = row.insertCell();
+                var yearCell = row.insertCell();
+                var subteamCell = row.insertCell();
+                var deleteCell = row.insertCell();
+                console.log(members[i].name)
+                nameCell.innerHTML = members[i].name;
+                // get the name of the cell with the value of the year
+                var possibles = document.getElementById('year').options
+                for (var j = 0; j < possibles.length; j++) {
+                    if (possibles[j].value == members[i].year) {
+                        yearCell.innerHTML = possibles[j].text;
+                    }
+                }
+                subteamCell.innerHTML = members[i].subteam;
+
+                deleteCell.innerHTML = '<button onclick="deleteStudent(' + members[i].id + ')" class="form-button">🗑️</button>';
+
+            }
+
+        }
+
+        function deleteStudent(id){
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/deleteStudent');
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify({ 
+                teamNumber: currentTeamNum,
+                id: id
+             }));
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var data = JSON.parse(xhr.responseText);
+                    if (data.success) {
+                        // Save the token, for example in localStorage
+                        //localStorage.setItem('authToken', data.token);
+                        setTimeout(function(){ getCurrentTeamInformation(); }, 100);
+                        
+                    } else {
+                        alert('Incorrect password!');
+                    }
+                }
+                else {
+                    alert('Request failed.  Returned status of ' + xhr.status);
+                }
+            };
+        }
+
+        function getCurrentTeamInformation(){
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/getTeamInformation');
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify({ 
+                teamNumber: currentTeamNum,
+                token: localStorage.getItem('authToken')
+             }));
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var data = JSON.parse(xhr.responseText);
+                    if (data.success) {
+                        // Save the token, for example in localStorage
+                        //localStorage.setItem('authToken', data.token);
+                        console.log(data);
+                        // Hide password section and show management section
+                        members = data.teamMembers;
+                        setMembers(members);
+                    } else {
+                        console.log(data)
+                        alert('Incorrect password!');
+                    }
+                }
+                else {
+                    alert('Request failed.  Returned status of ' + xhr.status);
+                }
+            };
+
+        }
+        function addStudent(){
+            var name = document.getElementById('student_name').value;
+            if(name == ""){
+                alert("Please enter a name")
+                return;
+            }
+            var year = document.getElementById('year').value;
+            var subteam = document.getElementById('subteam').value;
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/addStudent');
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify({ 
+                teamNumber: currentTeamNum,
+                token: localStorage.getItem('authToken'),
+                name: name,
+                year: year,
+                subteam: subteam
+             }));
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var data = JSON.parse(xhr.responseText);
+                    if (data.success) {
+                        // Save the token, for example in localStorage
+                        //localStorage.setItem('authToken', data.token);
+                        console.log(data);
+                        // Hide password section and show management section
+                        members = data.teamMembers;
+                        setTimeout(function(){ getCurrentTeamInformation(); }, 100);
+                    } else {
+                        alert('Incorrect password!');
+                    }
+                }
+                else {
+                    alert('Request failed.  Returned status of ' + xhr.status);
+                }
+            };
+        }
+        function checkPassword() {
+            var inputPassword = document.getElementById('passwordInput').value;
+            if(currentTeamNum == null) {
+                currentTeamNum = document.getElementById('teamNumberInput').value;
+            }
+            // Send a request to the backend to check the password
+            // convert to xhr
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/checkPassword');
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify({ 
+                team: currentTeamNum,
+                password: inputPassword
+             }));
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var data = JSON.parse(xhr.responseText);
+                    if (data.success && data.token) {
+                        // Save the token, for example in localStorage
+                        localStorage.setItem('authToken', data.token);
+
+                        // Hide password section and show management section
+                        document.getElementById('passwordSection').classList.add('hidden');
+                        document.getElementById('managementSection').classList.remove('hidden');
+                        document.getElementById('teamNumberLabel').textContent = 'Team ' + currentTeamNum;
+                        getCurrentTeamInformation();
+                    } else {
+                        alert('Incorrect password!');
+                    }
+                }
+                else {
+                    alert('Request failed.  Returned status of ' + xhr.status);
+                }
+            };
+
+        }
+    </script>
+
+</body>
+</html>

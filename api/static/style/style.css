@@ -1,0 +1,30 @@
+/* Custom styles go here */
+.form-label {
+    color: #4a5568; /* gray-700 */
+    font-size: 0.875rem; /* text-sm */
+    font-weight: 700; /* font-bold */
+    margin-bottom: 0.5rem; /* mb-2 */
+}
+
+.form-input, .form-textarea {
+    width: 100%; /* w-full */
+    padding: 0.5rem; /* p-2 */
+    border: 1px solid #d1d5db; /* border-gray-300 */
+    border-radius: 0.25rem; /* rounded-lg */
+    margin-bottom: 1rem; /* mb-4 */
+}
+
+.form-button {
+    background-color: #4299e1; /* bg-blue-500 */
+    color: white; /* text-white */
+    font-weight: 700; /* font-bold */
+    padding: 0.5rem 1rem; /* py-2 px-4 */
+    border-radius: 0.25rem; /* rounded */
+    outline: none; /* focus:outline-none */
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5); /* focus:shadow-outline */
+    cursor: pointer;
+}
+
+.form-button:hover {
+    background-color: #2b6cb0; /* hover:bg-blue-700 */
+}
